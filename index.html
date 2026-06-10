@@ -1,1 +1,112 @@
 
+<script>
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const W = 300, H = 300, CX = 150, CY = 150, TR = 108, BR = 15;
+
+  let scorpionAngle = 0;
+  let monkeyAngle = 0;
+  let monkeySpin = 0.02;
+  let monkeyFalling = false;
+  let fallAngle = null;
+
+  const days = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
+
+  function drawWheel() {
+    const segAngle = (2 * Math.PI) / 7;
+    for (let i = 0; i < 7; i++) {
+      const start = i * segAngle;
+      const end = start + segAngle;
+      ctx.beginPath();
+      ctx.arc(CX, CY, TR+40, start, end);
+      ctx.lineWidth = 20;
+      ctx.strokeStyle = "rgba(120,80,255,0.15)";
+      ctx.stroke();
+
+      // Label
+      const lx = CX + (TR+60) * Math.cos(start + segAngle/2);
+      const ly = CY + (TR+60) * Math.sin(start + segAngle/2);
+      ctx.fillStyle = "#7850ff";
+      ctx.font = "10px monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(days[i], lx, ly);
+    }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    drawWheel();
+
+    // Monkey (orange ball)
+    monkeyAngle += monkeySpin;
+    const footX = CX + 20 * Math.cos(monkeyAngle + Math.PI/2);
+    const footY = CY + 20 * Math.sin(monkeyAngle + Math.PI/2);
+
+    const og = ctx.createRadialGradient(CX-4, CY-4, 2, CX, CY, 13);
+    og.addColorStop(0, '#ffe080');
+    og.addColorStop(1, '#ff6a00');
+    ctx.beginPath();
+    ctx.arc(CX, CY, 13, 0, Math.PI * 2);
+    ctx.fillStyle = og;
+    ctx.fill();
+
+    // Scorpion (purple ball)
+    const bx = CX + TR * Math.cos(scorpionAngle);
+    const by = CY + TR * Math.sin(scorpionAngle);
+    const pg = ctx.createRadialGradient(bx-5, by-5, 2, bx, by, BR);
+    pg.addColorStop(0, '#d8b4ff');
+    pg.addColorStop(1, '#5510cc');
+    ctx.beginPath();
+    ctx.arc(bx, by, BR, 0, Math.PI * 2);
+    ctx.fillStyle = pg;
+    ctx.fill();
+
+    // Collision check
+    const dx = bx - footX;
+    const dy = by - footY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (!monkeyFalling && dist < BR + 5) {
+      monkeyFalling = true;
+      fallAngle = monkeyAngle;
+    }
+
+    // Monkey fall
+    if (monkeyFalling) {
+      const fx = CX + TR * Math.cos(fallAngle);
+      const fy = CY + TR * Math.sin(fallAngle);
+      ctx.beginPath();
+      ctx.arc(fx, fy, 13, 0, Math.PI * 2);
+      ctx.fillStyle = og;
+      ctx.fill();
+
+      // Pick day
+      const segAngle = (2*Math.PI)/7;
+      const dayIndex = Math.floor(((fallAngle + Math.PI) / (2*Math.PI)) * 7) % 7;
+      document.getElementById('st').textContent = "Picked: " + days[dayIndex];
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  function onMotion(e) {
+    const acc = e.accelerationIncludingGravity;
+    if (!acc) return;
+    const x = acc.x, y = acc.y;
+    const targetAngle = Math.atan2(y, x);
+    scorpionAngle += (targetAngle - scorpionAngle) * 0.1;
+  }
+
+  document.getElementById('btn').addEventListener('click', async () => {
+    if (typeof DeviceMotionEvent !== 'undefined' &&
+        typeof DeviceMotionEvent.requestPermission === 'function') {
+      const res = await DeviceMotionEvent.requestPermission();
+      if (res !== 'granted') { alert('Permission denied'); return; }
+    }
+    window.addEventListener('devicemotion', onMotion);
+    document.getElementById('btn').textContent = '✓ Motion On';
+    document.getElementById('btn').disabled = true;
+  });
+
+  draw();
+</script>
