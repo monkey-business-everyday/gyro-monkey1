@@ -171,3 +171,17 @@
 
   draw();
 </script>
+
+const monkeyImg = new Image();
+monkeyImg.src = "monkey.jpeg";   // use .jpeg here
+
+const scorpionImg = new Image();
+scorpionImg.src = "scorpion.jpeg";   // use .jpeg here
+
+monkeyImg.onload = () => {
+  ctx.drawImage(monkeyImg, CX-20, CY-20, 40, 40);
+};
+
+scorpionImg.onload = () => {
+  ctx.drawImage(scorpionImg, bx-10, by-10, 20, 20);
+};
