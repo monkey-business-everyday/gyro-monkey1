@@ -1,4 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Gyro Ball</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0a0a0f;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: monospace;
+      overflow: hidden;
+    }
+    h2 {
+      font-size: 0.75rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: #7850ff;
+      margin-bottom: 20px;
+    }
+    canvas {
+      box-shadow: 0 0 60px rgba(100,60,255,0.2), 0 0 0 1px #1e1e2e;
+      border-radius: 50%;
+    }
+    #btn {
+      margin-top: 22px;
+      padding: 13px 32px;
+      background: #7850ff;
+      border: none;
+      color: #fff;
+      font-family: monospace;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #btn:disabled { background: #333; color: #777; }
+    #info {
+      margin-top: 14px;
+      font-size: 0.72rem;
+      color: #555;
+      text-align: center;
+      line-height: 2;
+    }
+    .val { color: #50ffb0; }
+  </style>
+</head>
+<body>
 
+<h2>Gyro Ball</h2>
+<canvas id="c" width="300" height="300"></canvas>
+<button id="btn">▶ Enable Motion</button>
+<div id="info">
+  status: <span class="val" id="st">inactive</span><br>
+  accel x: <span class="val" id="dax">—</span>
+  &nbsp; y: <span class="val" id="day">—</span><br>
+  angle: <span class="val" id="dangle">0</span>
+</div>
 <script>
   const canvas = document.getElementById('c');
   const ctx = canvas.getContext('2d');
